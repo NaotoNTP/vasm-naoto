@@ -8,6 +8,7 @@ int nocase_macros;      /* macro names are case-insensitive */
 int maxmacparams = MAXMACPARAMS;
 int maxmacrecurs = MAXMACRECURS;
 int msource_disable;    /* true: disable source level debugging within macro */
+int multicomment = 0;
 
 #ifndef MACROHTABSIZE
 #define MACROHTABSIZE 0x800
@@ -1146,7 +1147,8 @@ section *find_structure(char *name,int name_len)
 char *read_next_line(void)
 {
   char *s,*srcend,*d;
-  int nparam,len,comment = 0;
+  int nparam,len;
+  int comment = 0;
   int skip_listing = 0;
   char *rept_end = NULL;
 
@@ -1338,9 +1340,17 @@ char *read_next_line(void)
 
   /* copy next line to linebuf */
   while (s<srcend && *s!='\0') {
-    int nc = 0;  
+    int nc = 0;
 
-    if (!comment) {
+    /* block comment logic */
+    if (strlen(s) >= 3) {
+      if ((!comment) && (!multicomment) && (!strnicmp(s,"#||",3)))
+        multicomment = 1;
+      else if ((multicomment) && (!strnicmp(s,"||#",3)))
+        multicomment = 0;
+    }
+
+    if ((!comment) && (!multicomment)) {
       if (nparam >= 0)
         nc = expand_macro(cur_src,&s,d,len);  /* try macro arg. expansion */
 
@@ -1376,6 +1386,7 @@ char *read_next_line(void)
       else if (len > 0) {
         if (*s == get_comment_char())
           comment = 1;
+        
         *d++ = *s++;
         len--;
       }
@@ -1424,9 +1435,14 @@ char *read_next_line(void)
     d = cur_src->linebuf + 1;
     len = cur_src->bufsize - 2;
     s = p + 1;
-    
+
     while (*s!='\0') {
-      int nc = expand_function(cur_src,&s,d,len); /* attempt to expand function calls in the line */
+      char *commstart = strstr(s,"#||");
+      char *commend = strstr(s,"||#");
+      int nc = 0;
+      
+      if ((!commend) || ((commstart) && (commend) && (commstart < commend) && (s < commstart)))
+        nc = expand_function(cur_src,&s,d,len); /* attempt to expand function calls in the line */
 
       if (nc > 0) {
         /* expanded functions */

@@ -3130,10 +3130,39 @@ int expand_ctrlparams(source *src,char **line,char *d,int dlen)
 int find_function_in_line(char *s)
 {
   symbol *sym;
-  char *name;
+  char *name, *t;
+  char *commend = strstr(s,"||#");
+
+  /* if we're inside a block comment, don't look for functions *unless* it ends on this line,
+     whichcase we start searching for functions after the block comment is closed */
+  if (commend) {
+    s = skip(commend+3);
+  }
+
+  if (blockcomment) {
+    if (!commend)
+      return 0;
+  }
 
   while (!ISEOL(s)) {
-    char *t = s;
+  
+    /* skip block comments that appear on this line */
+    if ((strlen(s) >= 3) && (!strnicmp(s,"#||",3))) {
+      s = skip(s+3);
+      
+      if ((strlen(s) >= 3) && (commend = strstr(s,"||#"))) {
+        s = skip(commend+3);
+
+        if (ISEOL(s)) {
+          break;
+        }
+      }
+      else {
+        break;
+      }
+    }
+
+    t = s;
 
     if ((!ISIDSTART(*(t-1))) && (!ISIDCHAR(*(t-1)))
         && ((name = parse_symbol(&t)) && (*t == '('))
@@ -3146,19 +3175,9 @@ int find_function_in_line(char *s)
   return 0;
 }
 
-int get_block_comment_state()
-{
-  return blockcomment;
-}
-
 char get_comment_char()
 {
   return commentchar;
-}
-
-void set_block_comment_state(int state)
-{
-  blockcomment = state;
 }
 
 char *skip_function_call_args(char *s) {

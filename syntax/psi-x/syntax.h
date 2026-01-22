@@ -50,6 +50,4 @@ char *my_skip_macro_arg(char *);
 void my_exec_macro(source *);
 #define EXEC_MACRO(s) my_exec_macro(s)
 
-int get_block_comment_state();
 char get_comment_char();
-void set_block_comment_state(int);
