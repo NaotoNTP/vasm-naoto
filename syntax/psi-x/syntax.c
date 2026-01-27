@@ -2907,6 +2907,10 @@ int expand_macro(source *src,char **line,char *d,int dlen)
 
         s = end;
       }
+      else {
+        s--;
+        return 0;
+      }
     }
     else {
       s--;
@@ -2955,6 +2959,10 @@ int expand_macro(source *src,char **line,char *d,int dlen)
             s = end + 1;
           }
         }
+      }
+      else {
+        s--;
+        return 0;
       }
     }
     else {
@@ -3088,6 +3096,10 @@ int expand_ctrlparams(source *src,char **line,char *d,int dlen)
       if ((sym = find_symbol(name)) && sym->type == STRSYM) {
         nc = sprintf(d,sym->text);
       }
+      else {
+        s = *line;
+        return 0;
+      }
     }
     else {
       s--;
@@ -3111,6 +3123,10 @@ int expand_ctrlparams(source *src,char **line,char *d,int dlen)
       if ((*s == '}') && (sym = find_symbol(name)) && (sym->type == STRSYM)) {
         nc = sprintf(d,sym->text);
         s++;
+      }
+      else {
+        s = *line;
+        return 0;
       }
     }
     else {
