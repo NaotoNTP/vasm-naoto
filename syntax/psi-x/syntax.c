@@ -2964,7 +2964,7 @@ int expand_macro(source *src,char **line,char *d,int dlen)
 
     if (nc >= dlen)
       nc = -1;
-    else if (nc > 0)
+    else if (nc >= 0)
      *line = s;  /* update line pointer when expansion took place */
   }
   else if ((end = skip_identifier(s)) != NULL) {
@@ -2998,7 +2998,7 @@ int expand_macro(source *src,char **line,char *d,int dlen)
 
     if (nc >= dlen)
       nc = -1;
-    else if (nc > 0)
+    else if (nc >= 0)
      *line = s;  /* update line pointer when expansion took place */
   }
 
@@ -3100,7 +3100,7 @@ int expand_ctrlparams(source *src,char **line,char *d,int dlen)
 
     if (nc >= dlen)
       nc = -1;
-    else if (nc > 0)
+    else if (nc >= 0)
       *line = s;  /* update line pointer when expansion took place */
   }
   else if (*s == '{') {
@@ -3120,7 +3120,7 @@ int expand_ctrlparams(source *src,char **line,char *d,int dlen)
 
     if (nc >= dlen)
       nc = -1;
-    else if (nc > 0)
+    else if (nc >= 0)
       *line = s;  /* update line pointer when expansion took place */
   }
 

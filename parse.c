@@ -1340,6 +1340,7 @@ char *read_next_line(void)
 
   /* copy next line to linebuf */
   while (s<srcend && *s!='\0') {
+    int zero_expand = 0;
     int nc = 0;
 
     /* block comment logic */
@@ -1351,14 +1352,19 @@ char *read_next_line(void)
     }
 
     if ((!comment) && (!multicomment)) {
+      char *t = s;
+
       if (nparam >= 0)
         nc = expand_macro(cur_src,&s,d,len);  /* try macro arg. expansion */
 
       if (nc == 0)
         nc = expand_ctrlparams(cur_src,&s,d,len); /* try control character expansion */
+
+      if ((nc == 0) && (s != t)) /* edge case for expansions of zero characters (ie a string symbol of length zero) */
+        zero_expand = 1;
     }
 
-    if (nc > 0) {
+    if ((nc > 0) || (zero_expand)) {
       /* expanded macro arguments or control characters */
       len -= nc;
       d += nc;
