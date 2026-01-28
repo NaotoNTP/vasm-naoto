@@ -1354,14 +1354,17 @@ char *read_next_line(void)
     if ((!comment) && (!multicomment)) {
       char *t = s;
 
-      if (nparam >= 0)
+      if (nparam >= 0) {
         nc = expand_macro(cur_src,&s,d,len);  /* try macro arg. expansion */
+      }
 
-      if (nc == 0)
+      if (nc == 0) {
         nc = expand_ctrlparams(cur_src,&s,d,len); /* try control character expansion */
+      }
 
-      if ((nc == 0) && (s != t)) /* edge case for expansions of zero characters (ie a string symbol of length zero) */
+      if ((nc == 0) && (s != t)) { /* edge case for expansions of zero characters (ie a string symbol of length zero) */
         zero_expand = 1;
+      }
     }
 
     if ((nc > 0) || (zero_expand)) {

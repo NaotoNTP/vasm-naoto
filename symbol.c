@@ -112,7 +112,7 @@ symbol *find_symbol(const char *name)
 {
   hashdata data;
   if (!find_name(symhash,name,&data))
-    return 0;
+    return NULL;
   return data.ptr;
 }
 

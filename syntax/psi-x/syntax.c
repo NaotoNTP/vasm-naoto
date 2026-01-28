@@ -2513,15 +2513,17 @@ void parse(void)
             continue;
           }
           s = skip(s+1);
-          
-          text = s;
 
           /* duplicate the string data */
-          if ((buf = get_local_label(1,&text)) || (buf = parse_identifier(1,&text))) {
+          if (((text = s) && (buf = get_local_label(1,&text))) || ((text = s) && (buf = parse_identifier(1,&text)))) {
+            sym = find_symbol(buf->str);
             s = text;
-            
-            if (!(sym = find_symbol(buf->str)) && !(sym->type == STRSYM)) {
-              syntax_error(27,buf->str); /* string symbol not found */
+
+            if ((sym == NULL) || (sym->type != STRSYM)) {
+              char *err_txt = mystrdup(buf->str);
+              
+              syntax_error(27,err_txt); /* string symbol not found */
+              myfree(err_txt);
               eol(s);
               continue;
             }
@@ -2839,7 +2841,6 @@ int expand_macro(source *src,char **line,char *d,int dlen)
         s++;
       }
       else {
-        s--;
         return 0;
       }
     }
@@ -2850,7 +2851,6 @@ int expand_macro(source *src,char **line,char *d,int dlen)
         s++;
       }
       else {
-        s--;
         return 0;
       }
     }
@@ -2908,12 +2908,10 @@ int expand_macro(source *src,char **line,char *d,int dlen)
         s = end;
       }
       else {
-        s--;
         return 0;
       }
     }
     else {
-      s--;
       return 0;
     }
 
@@ -2961,12 +2959,10 @@ int expand_macro(source *src,char **line,char *d,int dlen)
         }
       }
       else {
-        s--;
         return 0;
       }
     }
     else {
-      s--;
       return 0;
     }
 
@@ -3097,12 +3093,10 @@ int expand_ctrlparams(source *src,char **line,char *d,int dlen)
         nc = sprintf(d,sym->text);
       }
       else {
-        s = *line;
         return 0;
       }
     }
     else {
-      s--;
       return 0;
     }
 
@@ -3125,12 +3119,10 @@ int expand_ctrlparams(source *src,char **line,char *d,int dlen)
         s++;
       }
       else {
-        s = *line;
         return 0;
       }
     }
     else {
-      s--;
       return 0;
     }
 
