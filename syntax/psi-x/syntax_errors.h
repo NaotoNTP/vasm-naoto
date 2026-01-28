@@ -30,9 +30,9 @@
   "local macro variable <%s> already declared",WARNING,															/* 26 */
 	"string symbol <%s> not found",ERROR,																							/* 27 */
 	"quoted string or string symbol expected",ERROR,																	/* 28 */
-	"substring index must be a positive, non-zero value",ERROR,												/* 29 */
-	"substring ending index cannot be greater than the starting index",ERROR,					/* 30 */
-	"substring index cannot be greater than the length of the string",ERROR,					/* 31 */
+	"substring index out of range",WARNING,																						/* 29 */
+	"substring starting index is greater than the ending index",WARNING,							/* 30 */
+	"substring index is greater than the length of the string",WARNING,								/* 31 */
 	"string stack capacity reached (%d)",ERROR,																				/* 32 */
 	"string stack is empty",ERROR,																										/* 33 */
 

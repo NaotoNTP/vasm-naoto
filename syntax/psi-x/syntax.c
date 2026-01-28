@@ -2466,7 +2466,7 @@ void parse(void)
         else if (!strnicmp(s,"substr",6) && isspace((unsigned char)*(s+6))) {
           strbuf *buf;
           symbol *sym;
-          char *text, substr[256];
+          char *text, *substr;
           int start, end, len;
           char backup;
 
@@ -2479,8 +2479,8 @@ void parse(void)
           else {
             start = (parse_constexpr(&s)) - 1;
             if (start < 0) {
-              syntax_error(29); /* substring index must be positive */
-              continue;
+              syntax_error(29); /* substring index is negative */
+              start = 0;
             }
           }
           
@@ -2498,12 +2498,12 @@ void parse(void)
           else {
             end = parse_constexpr(&s);
             if (end < 0) {
-              syntax_error(29); /* substring index must be positive */
-              continue;
+              syntax_error(29); /* substring index is negative */
+              end = 0;
             }
             else if (end <= start) {
-              syntax_error(30); /* substring ending index greater than the starting index */
-              continue;
+              syntax_error(30); /* substring starting index is greater than the ending index */
+              end = 0;
             }
           }
           
@@ -2540,21 +2540,32 @@ void parse(void)
           }
 
           /* get the copy length and set the ending position if necessary */
-          if (end < 0)
+          if (end < 0) {
             end = strlen(text);
+
+            if (end <= start) {
+              syntax_error(30); /* substring starting index is greater than the ending index */
+              end = 0;
+            }
+          }
           else if (end > strlen(text)) {
             syntax_error(31); /* substring ending index greater length of string */
-            myfree(text);
-            eol(s);
-            continue;
+            end = strlen(text);
           }
 
           len = end - start;
 
           /* create the substring and assign it to the symbol */
-          strncpy(substr,&text[start],len);
-          substr[len] = '\0';
-          new_strsym(labname,substr);
+          if (len > 0) {
+            substr = mymalloc(len+1);
+            strncpy(substr,&text[start],len);
+            substr[len] = '\0';
+            new_strsym(labname,substr);
+          }
+          else {
+            substr = mystrdup("");
+            new_strsym(labname,substr);
+          }
 
           /* free the memory containing duplicate string data and continue parsing */
           myfree(text);
@@ -2844,7 +2855,7 @@ int expand_macro(source *src,char **line,char *d,int dlen)
         return 0;
       }
     }
-    else if (*s == '_') {
+    else if ((*s == '_') && (!ISIDCHAR(*(s+1)))){
       /* \_: insert the full list of arguments passed to this macro call */
       if (src->callargs) {
         nc = sprintf(d,"%s",src->callargs);
