@@ -302,7 +302,7 @@ static void write_output(FILE *f,section *sec,symbol *sym)
 		/* Special case for string symbols to be exported as standard symbols (allows compatibility with official versions of vlink). */
 		/* NOTE: The length of the string symbol is what's exported, not the text, as that's only relevant to pre-proccessor text replacement during assembly. */
 		if (symp->type == STRSYM)
-	    write_number(f,LABSYM);
+	    write_number(f,EXPRESSION);
 		else
 	    write_number(f,symp->type);
     
