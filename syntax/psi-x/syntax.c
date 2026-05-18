@@ -242,7 +242,9 @@ char *skip_operand(char *s)
     else if (c=='\'' || c=='\"')
     #endif
       s = skip_string(s,c,NULL) - 1;
-    else if (!c || (par_cnt==0 && (c==',' || c==commentchar)))
+    else if(ISEOL(s) || ((c==',' || isspace((unsigned char)c)) && par_cnt==0))
+      break;
+    else if (!c || (par_cnt==0 && c==commentchar))
       break;
     else if (!strnicmp(s,"#||",3)) {
       blockcomment = 1;
